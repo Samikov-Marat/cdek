@@ -18,18 +18,20 @@
 <script>
     export default {
         props: {
-            apiUrl: String,
-            notesDefault: Array
+            apiUrl: String, // url для получения списка заметок
+            notesDefault: Array // список заметок, которые уже есть в базе
         },
         data: function () {
             return {
-                notes: this.notesDefault
+                notes: this.notesDefault // Список заметок изначально берём из параметра
             };
         },
 
         mounted() {
             let thisVue = this;
+            // Обработчик события изменения списка заметок
             this.$root.$on('change-note-list', function () {
+                // Загружаем новый список заметок
                 axios
                     .get(thisVue.apiUrl)
                     .then(response => (thisVue.notes = response.data));

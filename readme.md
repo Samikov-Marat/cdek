@@ -1,59 +1,66 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# Тестовое задание
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Фреймворк `Laravel 5.6`
 
-## About Laravel
+`Bootstrap 4.3.1`
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+Работоспособность проверялась на
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**php 7.2**
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications.
+**MySql 5.6**
 
-## Learning Laravel
+## Инструкция по развертываюнию
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
+1. Создать базу данных. Кодировка `utf8_general`
+1. Создать вируальный сервер. Точка входа приложения `/public/index.php`. Настроить файл `hosts` в системе при необходимости.
+1. Отредактировать `.env`
+    1. Изменить `APP_URL=http://cdek.local` указав свой адрес локального сервера
+    1. Изменить `DB_CONNECTION`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` и пр. в соответствии с настройками MySql-сервера
+1. Для миграции в папке проекта выполнить `php artisan migrate`
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell):
+## Описание
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Pulse Storm](http://www.pulsestorm.net/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
+Файлы
 
-## Contributing
+`database/migrations/2019_11_25_173618_create_notes_table.php` Миграция для создания таблицы заметок
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+`app/Note.php` Модель заметок
 
-## Security Vulnerabilities
+`app/NoteAdapter.php` Вспомогательный класс. Добавляет к заметкам адрес api для их удаления
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+`routes/web.php` Описывает один маршрут. Вызввает контроллер главной страницы 
 
-## License
+`routes/api.php` Описывает маршруты для API-контроллера. 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+`app/Http/Controllers/HomepageController.php` Контроллер главной страницы. Подготавливает список заметок, показывает главную страницу
+
+`app/Http/Controllers/Api/V1/NotesController.php` Контроллер API. Возвращает список заметок, добавляет и удаляет заметку.
+
+`resources/views/homepage/index.blade.php` Шаблон главной страницы. Минимальная вёрстка.
+
+`resources/assets/js/components/NoteForm.vue` Vue-компонент с формой добавления заметки.
+
+`resources/assets/js/components/NoteIndex.vue` Vue-компонент со списком заметок
+
+`resources/assets/js/components/NoteTableRow.vue` Vue-компонент с одной заметкой из списка
+
+`resources/assets/js/app.js` Подключает vue-компоненты и создаёт vue-приложение `note-app`
+
+## Алгоритм
+
+В приложение добавляются компонент `note-form` и `note-index`.
+
+`note-form` получает параметр `apiUrl` - адрес для оправки данных в api для добавления заметки.
+
+При добавлении новой заметки пользователем `note-form` отправляет POST-запрос на сервер, очищает форму, генерирует событие `change-note-list`. Событие `change-note-list` генерируется на уровне приложения `note-app`, так как обрабатывается в другом компоненте.
+
+`note-index` получает параметр `apiUrl` - адрес для получения списка заметок из api и `notesDefault` - список заметок, которые сейчас уже есть в базе. При событии `change-note-list` перезагружает список заметок, обращаясь к api
+
+С помощью компонента `note-table-row` отображает список заметок с кнопками удаления.  
+
+`note-table-row` оотображает одну заметку в списке с кнопко удаления. При удалении заметки генерирует событие `change-note-list` так же на уровне приложения. 
+
+
